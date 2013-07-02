@@ -38,11 +38,15 @@ class WikiPageView (DetailView):
     slug_field = 'pg_url'
 
     def dispatch(self, request, *args, **kwargs):
-        url_str = [v for k,v in self.request.META.items() if k == 'PATH_INFO'][0]
-        lst = url.split('/')
+        lst = [v for k,v in self.request.META.items() if k == 'PATH_INFO'][0].split('/')
         if lst[-1]:
             self.kwargs[self.slug_url_kwarg] = lst[-1]
-            self.kwargs['parent'] = 1
+            self.kwargs['parent'] = lst[-2]
         else:
             self.kwargs[self.slug_url_kwarg] = lst[-2]
+            self.kwargs['parent'] = lst[-3]
         return super (WikiPageView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs ['parent'] = self.kwargs['parent']
+        return super(WikiPageView,self).get_context_data(**kwargs)
