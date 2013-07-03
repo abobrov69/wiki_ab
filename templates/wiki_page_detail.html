@@ -1,21 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Message{% endblock %}
+{% block title %}{{ wikipage.header }}{% endblock %}
 
 {% block content %}
     <div class="container">
       <div class="row-fluid">
         <div class="span12">
-            <p><a href="/">[Перейти на главную страницу]</a>
+            <p><a href="/">[Перейти на главную страницу]</a>&nbsp<a href="{{ parent }}">[Перейти на родительскую страницу ({{ parent_header }})]</a>
             </p>
         </div>
       </div>
       <div class="row-fluid">
-        <div class="span6">
+        <div class="span12">
               <h2>{{ wikipage.header }}</h2>
-        </div><!--/span-->
-        <div class="span6">
-              {{ parent }}
         </div><!--/span-->
       </div><!--/row-->
       <div class="row-fluid">
@@ -23,6 +20,33 @@
             <p>{{ wikipage.text }}</p>
         </div><!--/span-->
       </div><!--/row-->
+      <div class="row-fluid">
+        <div class="span4">
+            <p>[Добавить дочернюю страницу]]</p>
+        </div><!--/span-->
+        <div class="span4">
+            <p>[Редактировать страницу]]</p>
+        </div><!--/span-->
+      </div><!--/row-->
+        <div class="span4">
+            <p>[Удалить страницу]]</p>
+        </div><!--/span-->
+             {% if child %}
+                  <div class="row-fluid">
+                     <div class="span12">
+                       <h3>Дочерние страницы</h3>
+                     </div><!--/span-->
+                  </div><!--/row-->
+                  {% for pg in child %}
+                      <div class="row-fluid">
+                         <div class="span12">
+                             <a href="{{ parent }}{{ pg.pg_url }}">{{ pg.header }}</a>
+                         </div>
+                      <div class="row-fluid">
+                           <div class="span12"><hr size="1" width="100%" align="center" color="black"></div>
+                      </div>
+                 {% endfor %}
+             {% endif %}
 
     </div><!--/.fluid-container-->
 
