@@ -20,5 +20,6 @@ urlpatterns = patterns('',
     url('^$', RootPageView.as_view (), name="rootpage"),
     url(r'^admin/', include(admin.site.urls)),
     (r'^about/$', AboutView.as_view()),
-    ('(^([^/]+)/([^/]+)/)*$', WikiPageView.as_view()),
+    (r'(^([^/]+)/)*(add/|add)$', AboutView.as_view()),
+    (r'(^([^/]+)/)*$', WikiPageView.as_view()),
 )

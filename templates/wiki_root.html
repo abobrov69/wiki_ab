@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Test Wiki{% endblock %}
+
+{% block content %}
+
+    <div class="container" xmlns="http://www.w3.org/1999/html">
+      <div class="row-fluid">
+        <div class="span12"> <h3>Test Wiki</h3></div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">Здесь должно быть описание проекта и как с ним работать...</div>
+      </div>
+
+      <div class="row-fluid">
+          <div class="span12">
+            <h2>Статьи верхнего уровня</h2>
+          </div>
+      </div>
+      <div class="row-fluid">
+           <div class="span12"><hr size="3" width="100%" align="center" color="black"></div>
+      </div>
+             {% if pg_list %}
+                  {% for pg in pg_list %}
+                      <div class="row-fluid">
+                         <div class="span12">
+                             <a href="/{{ pg.pg_url }}/">{{ pg.header }}</a>
+                         </div>
+                      <div class="row-fluid">
+                           <div class="span12"><hr size="1" width="100%" align="center" color="black"></div>
+                      </div>
+                 {% endfor %}
+             {% endif %}
+    </div><!--/.fluid-container-->
+
+{% endblock %}
