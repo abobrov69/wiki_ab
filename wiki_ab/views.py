@@ -1,7 +1,8 @@
-from django.views.generic import TemplateView, DetailView, ListView
+from django.views.generic import TemplateView, DetailView, ListView, UpdateView
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ObjectDoesNotExist
 from models import WikiPage
+from forms import PageFormEdit
 
 class AboutView(TemplateView):
     template_name = "about.html"
@@ -43,19 +44,10 @@ def get_self_url_substring(url_str):
     l = url_str.split('/')
     return l[-2] if not l[-1] else l[-1]
 
-class WikiPageView (DetailView):
-    template_name = "wiki_page_detail.html"
+class WikiPageMixin (object):
     model = WikiPage
     slug_field = 'pg_url'
     queryset = WikiPage._default_manager.filter (isdeleted=False)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.kwargs['url'] = [v for k,v in self.request.META.items() if k == 'PATH_INFO'][0].split('/')
-        if not self.kwargs['url'][-1]: del self.kwargs['url'][-1]
-        if not self.kwargs['url'][0]: del self.kwargs['url'][0]
-#        self.kwargs[self.slug_url_kwarg] = self.kwargs['url'][-1]
-#        self.kwargs['parent'] = self.kwargs['url'][-2] if len(self.kwargs['url'])>1 else ''
-        return super (WikiPageView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
@@ -79,16 +71,45 @@ class WikiPageView (DetailView):
 #            elif i != 0:
 #                raise Http404('Incorrect url: /{0}/.'.format('/'.join(self.kwargs['url'])))
         self.kwargs['parent_header']= headers[-2] if len(headers)>1 else "Root page"
-        work_queryset = queryset.filter(**{'parent_pg_url': obj.pg_url})
-        if work_queryset:
-            self.kwargs['child']=[]
-            for i in work_queryset:
-                self.kwargs['child'].append ({'pg_url':obj.pg_url+'/'+i.pg_url+'/','header':i.header})
-
+        if self.show_child:
+            work_queryset = queryset.filter(**{'parent_pg_url': obj.pg_url})
+            if work_queryset:
+                self.kwargs['child']=[]
+                for i in work_queryset:
+                    self.kwargs['child'].append ({'pg_url':obj.pg_url+'/'+i.pg_url+'/','header':i.header})
         return obj
+
+    def split_url (self):
+        self.kwargs['url'] = [v for k,v in self.request.META.items() if k == 'PATH_INFO'][0].split('/')
+        if not self.kwargs['url'][-1]: del self.kwargs['url'][-1]
+        if not self.kwargs['url'][0]: del self.kwargs['url'][0]
+
+class WikiPageView (WikiPageMixin, DetailView):
+    template_name = "wiki_page_detail.html"
+    show_child = True
+
+    def dispatch(self, request, *args, **kwargs):
+        self.split_url()
+        return DetailView.dispatch(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs ['parent'] = '/{0}/'.format('/'.join(self.kwargs['url'][:-1])) if len(self.kwargs['url'])>1 else '/'
         kwargs['parent_header'] = self.kwargs['parent_header']
         kwargs['child'] = self.kwargs.get('child', None)
         return super(WikiPageView,self).get_context_data(**kwargs)
+
+class WikiPageUpdate (WikiPageMixin, UpdateView):
+    template_name = "wiki_page_edit.html"
+    form_class = PageFormEdit
+    show_child = False
+
+    def dispatch(self, request, *args, **kwargs):
+        self.split_url()
+        del self.kwargs['url'][-1] # exclude /edit
+        self.success_url = '/{0}/'.format('/'.join(self.kwargs['url']))
+        return UpdateView.dispatch(self, request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs ['parent'] = '/{0}/'.format('/'.join(self.kwargs['url'][:-1])) if len(self.kwargs['url'])>1 else '/'
+        kwargs['parent_header'] = self.kwargs['parent_header']
+        return super(WikiPageUpdate,self).get_context_data(**kwargs)

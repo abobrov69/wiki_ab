@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Edit page{% endblock %}
+
+{% block content %}
+    <div class="container">
+      <div class="row-fluid">
+        <div class="span12">
+            <p><a href="/">[Перейти на главную страницу]</a>&nbsp<a href="{{ parent }}">[Перейти на родительскую страницу ({{ parent_header }})]</a>
+            </p>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+              <h2>Edit page <i>{{ wikipage.pg_url }}</i></h2>
+        </div><!--/span-->
+      </div><!--/row-->
+
+      <div class="row-fluid">
+        <div class="span12">
+
+              {% if form.errors %}
+                    <p class="text-error">
+                    Please correct the error{{ form.errors|pluralize }} below.
+                    </p>
+              {% endif %}
+
+              <form action="" method="post">{% csrf_token %}
+                     <ul class="nav nav-list">
+                         {{ form.as_ul }}
+                     </ul>
+                     <input type="submit" value="Save page">&nbsp;&nbsp;&nbsp;<a href="{{ parent }}{{ wikipage.pg_url }}/" class="btn">Cancel</a>
+
+              </form>
+        </div><!--/span-->
+      </div><!--/row-->
+    </div><!--/.fluid-container-->
+
+{% endblock %}

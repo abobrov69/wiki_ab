@@ -21,20 +21,15 @@
         </div><!--/span-->
       </div><!--/row-->
       <div class="row-fluid">
-        <div class="span4">
-            <p>[Добавить дочернюю страницу]]</p>
-        </div><!--/span-->
-        <div class="span4">
-            <p>[Редактировать страницу]]</p>
+        <div class="span12">
+            <p>[Добавить дочернюю страницу]&nbsp<a href="{{ parent }}{{ wikipage.pg_url }}/edit">[Редактировать страницу]</a>&nbsp[Удалить страницу]</p>
         </div><!--/span-->
       </div><!--/row-->
-        <div class="span4">
-            <p>[Удалить страницу]]</p>
-        </div><!--/span-->
+
              {% if child %}
                   <div class="row-fluid">
                      <div class="span12">
-                       <h3>Дочерние страницы</h3>
+                       <h4>Дочерние страницы</h4>
                      </div><!--/span-->
                   </div><!--/row-->
                   {% for pg in child %}

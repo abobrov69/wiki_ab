@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from views import AboutView, WikiPageView, RootPageView
+from views import AboutView, WikiPageView, RootPageView, WikiPageUpdate
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -21,5 +21,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     (r'^about/$', AboutView.as_view()),
     (r'(^([^/]+)/)*(add/|add)$', AboutView.as_view()),
+    (r'(^([^/]+)/)*(edit/|edit)$', WikiPageUpdate.as_view()),
     (r'(^([^/]+)/)*$', WikiPageView.as_view()),
 )
