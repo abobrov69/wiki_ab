@@ -15,6 +15,7 @@ class WikiPage(models.Model):
 
     def delete(self, using=None):
         self.isdeleted = True
+        self.pg_url = '|!del!|{0}|!del!|'.format(self.pg_url)
         self.save ()
 
 #    class Meta:

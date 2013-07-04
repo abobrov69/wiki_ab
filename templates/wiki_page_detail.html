@@ -22,7 +22,13 @@
       </div><!--/row-->
       <div class="row-fluid">
         <div class="span12">
-            <p>[Добавить дочернюю страницу]&nbsp<a href="{{ parent }}{{ wikipage.pg_url }}/edit">[Редактировать страницу]</a>&nbsp[Удалить страницу]</p>
+            <p> <a href="{{ parent }}{{ wikipage.pg_url }}/add">[Добавить дочернюю страницу]</a>&nbsp
+                <a href="{{ parent }}{{ wikipage.pg_url }}/edit">[Редактировать страницу]</a>&nbsp
+                {% if child %}
+                    [Удаление страницы с дочерними страницами невозможно]</p>
+                {% else %}
+                    <a href="{{ parent }}{{ wikipage.pg_url }}/delete">[Удалить страницу]</a></p>
+                {% endif %}
         </div><!--/span-->
       </div><!--/row-->
 
