@@ -1,8 +1,8 @@
 from django.db import models
 
 class WikiPage(models.Model):
+    pg_url = models.CharField(max_length=64)
     header = models.CharField(max_length=256)
-    pg_url = models.CharField(max_length=64, primary_key=True)
     parent_pg_url = models.CharField(max_length=64, blank=True)
     isdeleted = models.BooleanField(default=False)
     text = models.TextField(blank=True)

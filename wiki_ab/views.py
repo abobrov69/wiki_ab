@@ -50,15 +50,19 @@ class WikiPageMixin (object):
     queryset = WikiPage._default_manager.filter (isdeleted=False)
     get_object_return_none = False
 
+
     def split_url (self):
         self.kwargs['url'] = [v for k,v in self.request.META.items() if k == 'PATH_INFO'][0].split('/')
         if not self.kwargs['url'][-1]: del self.kwargs['url'][-1]
         if not self.kwargs['url'][0]: del self.kwargs['url'][0]
 
     def get_context_data(self, **kwargs):
-        kwargs ['parent'] = u'/{0}/'.format(u'/'.join(self.kwargs['url'][:-1])) if len(self.kwargs['url'])>1 else '/'
-        kwargs['parent_header'] = self.kwargs['parent_header']
+        kwargs['parent'] = u'/{0}/'.format(u'/'.join(self.kwargs['url'][:-1])) if len(self.kwargs['url'])>1 else '/'
+        kwargs['parent_header'] = self.kwargs.get('parent_header', None)
+        kwargs['self_header'] = self.kwargs.get('self_header', None)
         kwargs['child'] = self.kwargs.get('child', None)
+        kwargs['self_url'] = self.kwargs['url'][-1]+'/' if self.kwargs['url'] else ''
+        kwargs['add_mode'] = self.get_object_return_none
         return self.upper_class.get_context_data(self,**kwargs)
 
     def get_object(self, queryset=None):
@@ -68,6 +72,7 @@ class WikiPageMixin (object):
         for i in range(0,len(self.kwargs['url'])):
             slug = self.kwargs['url'][i]
             work_queryset = queryset.filter(**{slug_field: slug})
+#            aaa = aaa1
             try:
                 obj = work_queryset.get()
 #                a = sasl
@@ -81,6 +86,7 @@ class WikiPageMixin (object):
                     raise Http404(u'Incorrect url: /{0}/.'.format('/'.join(self.kwargs['url'])))
             headers.append(obj.header)
         self.kwargs['parent_header']= headers[-2] if len(headers)>1 else "Root page"
+        self.kwargs['self_header']= headers[-1] if len(headers)>0 else "Root page"
         if self.show_child:
             work_queryset = queryset.filter(**{'parent_pg_url': obj.pg_url})
             if work_queryset:
@@ -132,14 +138,23 @@ class WikiPageCreate(WikiPageMixin,UpdateView):
     def dispatch(self, request, *args, **kwargs):
         self.split_url()
         del self.kwargs['url'][-1] # exclude /add
-#        self.success_url = u'/{0}/'.format('/'.join(self.kwargs['url'][:-1])) if len(self.kwargs['url'])>1 else '/'
+        self.parent_pg_url = self.kwargs['url'][-1] if self.kwargs['url'] else ''
         return UpdateView.dispatch(self, request, *args, **kwargs)
 
     def form_valid(self, form):
         """
         If the form is valid, save the associated model.
         """
-        a = self.object
-        b = lkj
         self.object = form.save()
+        self.object.parent_pg_url = self.parent_pg_url
+        self.object.save()
+        self.success_url = (u'/{0}/'.format('/'.join(self.kwargs['url'])) if len(self.kwargs['url'])>0 else '/') + self.object.pg_url + '/'
         return super(WikiPageCreate, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super(WikiPageCreate,self).get_form_kwargs()
+        kwargs['parent_pg_url'] = self.parent_pg_url
+        kwargs['queryset'] = self.queryset
+        return kwargs
+
+

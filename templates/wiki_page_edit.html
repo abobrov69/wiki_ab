@@ -1,18 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Edit page{% endblock %}
+{% block title %}
+    {% if add_mode %}
+       Add page
+    {% else %}
+       Edit page
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     <div class="container">
       <div class="row-fluid">
         <div class="span12">
-            <p><a href="/">[Перейти на главную страницу]</a>&nbsp<a href="{{ parent }}">[Перейти на родительскую страницу ({{ parent_header }})]</a>
+            <p><a href="/">[Перейти на главную страницу]</a>&nbsp
+                {% if add_mode %}
+                  <a href="{{ parent }}{{ self_url }}">[Перейти на родительскую страницу ({{ self_header }})]</a>
+                {% else %}
+                  <a href="{{ parent }}">[Перейти на родительскую страницу ({{ parent_header }})]</a>
+                {% endif %}
             </p>
         </div>
       </div>
       <div class="row-fluid">
         <div class="span12">
-              <h2>Edit page <i>{{ wikipage.pg_url }}</i></h2>
+            {% if add_mode %}
+                <h2>Добавление дочерней страницы к странице <i>{{ self_url }}</i></h2>
+            {% else %}
+                <h2>Редактирование страницы <i>{{ self_url }}</i></h2>
+            {% endif %}
         </div><!--/span-->
       </div><!--/row-->
 
@@ -29,7 +44,7 @@
                      <ul class="nav nav-list">
                          {{ form.as_ul }}
                      </ul>
-                     <button type="submit" class="btn">Save page</button>&nbsp;&nbsp;&nbsp;<a href="{{ parent }}{{ wikipage.pg_url }}/" class="btn">Cancel</a>
+                     <button type="submit" class="btn">Save page</button>&nbsp;&nbsp;&nbsp;<a href="{{ parent }}{{ self_url }}" class="btn">Cancel</a>
 
               </form>
         </div><!--/span-->
