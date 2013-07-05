@@ -17,11 +17,16 @@ class PageFormNew (forms.ModelForm):
         return super(PageFormNew,self).__init__(**kwargs)
 
     def clean_pg_url(self):
-        if self.queryset and self.parent_pg_url:
-            pg_url = self.cleaned_data['pg_url']
-            work_queryset = self.queryset.filter(**{'parent_pg_url': self.parent_pg_url,"pg_url":pg_url})
-            if work_queryset:
-               raise forms.ValidationError("Page {0} already has the child page {1}".format(self.parent_pg_url, pg_url))
+        pg_url = self.cleaned_data['pg_url']
+        if self.queryset:
+            if self.parent_pg_url:
+                work_queryset = self.queryset.filter(**{'parent_pg_url': self.parent_pg_url,"pg_url":pg_url})
+                if work_queryset:
+                    raise forms.ValidationError("Page {0} already has the child page {1}".format(self.parent_pg_url, pg_url))
+            else:
+                work_queryset = self.queryset.filter(**{'parent_pg_url': "","pg_url":pg_url})
+                if work_queryset:
+                    raise forms.ValidationError("Root page already has the child page {0}".format(pg_url))
         return pg_url
 
     class Meta:
