@@ -18,6 +18,7 @@ class PageFormNew (forms.ModelForm):
 
     def clean_pg_url(self):
         pg_url = self.cleaned_data['pg_url']
+        if not pg_url: return pg_url
         if self.queryset:
             if self.parent_pg_url:
                 work_queryset = self.queryset.filter(**{'parent_pg_url': self.parent_pg_url,"pg_url":pg_url})
@@ -31,8 +32,8 @@ class PageFormNew (forms.ModelForm):
 
     class Meta:
         model = WikiPage
-        exclude = ('parent_pg_url','isdeleted')
-#        fields = ('text')
+#        exclude = ('parent_pg_url','isdeleted')
+        fields = ('header','text','pg_url')
         widgets = {
             'text': forms.Textarea(attrs={'cols': 80, 'rows': 13, 'class': "span9"}),
         }

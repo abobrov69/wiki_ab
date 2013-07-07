@@ -1,8 +1,22 @@
 from django.views.generic import TemplateView, DetailView, ListView, UpdateView, DeleteView, CreateView
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 from models import WikiPage
+from gns_string_func import transliterate_and_convert_to_url
 from forms import PageFormEdit, PageFormNew
+from django.views.decorators.csrf import requires_csrf_token
+from django.template import (RequestContext,
+                             loader, Template, TemplateDoesNotExist)
+
+@requires_csrf_token
+def wiki_page_not_found(request, template_name='404.html', *args, **kwargs):
+    try:
+        template = loader.get_template(template_name)
+    except TemplateDoesNotExist:
+        template = Template(
+            '<h1>Not Found</h1>'
+            '<p>The requested URL {{ request_path }} was not found on this server.</p>')
+    return HttpResponseNotFound(template.render(RequestContext(request, {'request_path': request.path, 'add_url':get_parent_url_string(request.path)+'add/'})))
 
 class AboutView(TemplateView):
     template_name = "about.html"
@@ -33,7 +47,9 @@ def display_meta(request,*kwargs):
 
 def get_parent_url_string(url_str):
     l = url_str.split('/')
-    return '/'.join(l[:-1 if l[-1] else -2])+'/'
+    if not l[-1]: del l[-1]
+    if not l[0]: del l[0]
+    return '/{0}/'.format('/'.join(l)) if len (l)>1 else '/'
 
 def get_parent_url_substring(url_str):
     l = url_str.split('/')
@@ -81,7 +97,7 @@ class WikiPageMixin (object):
                           {'verbose_name': queryset.model._meta.verbose_name})
             if i == 0:
                 if (obj.parent_pg_url):
-                    raise Http404(u'Incorrect url: /{0}/.'.format(slug))
+                    raise Http404(u'Incorrect url: /{0}/.'.format(slug)+'<br><a href="/add">Create page</a>' )
             elif not obj.parent_pg_url or self.kwargs['url'][i-1] != obj.parent_pg_url:
                     raise Http404(u'Incorrect url: /{0}/.'.format('/'.join(self.kwargs['url'])))
             headers.append(obj.header)
@@ -146,6 +162,10 @@ class WikiPageCreate(WikiPageMixin,UpdateView):
         If the form is valid, save the associated model.
         """
         self.object = form.save()
+        if not self.object.pg_url:
+            self.object.pg_url = transliterate_and_convert_to_url (self.object.header)
+#            a = self.object
+#            skd = dsd
         self.object.parent_pg_url = self.parent_pg_url
         self.object.save()
         self.success_url = (u'/{0}/'.format('/'.join(self.kwargs['url'])) if len(self.kwargs['url'])>0 else '/') + self.object.pg_url + '/'

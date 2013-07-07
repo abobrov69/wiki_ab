@@ -23,8 +23,10 @@
       </div>
       <div class="row-fluid">
         <div class="span12">
-            {% if add_mode %}
-                <h2>Добавление дочерней страницы к странице <i>{{ self_url }}</i></h2>
+            {% if add_mode and self_url %}
+                <h2>Добавление дочерней страницы к странице <i>"{{ self_header }}"</i></h2>
+            {% elif add_mode %}
+                <h2>Добавление страницы первого уровня</h2>
             {% else %}
                 <h2>Редактирование страницы <i>{{ self_url }}</i></h2>
             {% endif %}
