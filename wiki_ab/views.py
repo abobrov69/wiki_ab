@@ -7,6 +7,7 @@ from forms import PageFormEdit, PageFormNew
 from django.views.decorators.csrf import requires_csrf_token
 from django.template import (RequestContext,
                              loader, Template, TemplateDoesNotExist)
+from wiki_decode import WikiToHTMLDecoder
 
 @requires_csrf_token
 def wiki_page_not_found(request, template_name='404.html', *args, **kwargs):
@@ -65,6 +66,7 @@ class WikiPageMixin (object):
     slug_field = 'pg_url'
     queryset = WikiPage._default_manager.filter (isdeleted=False)
     get_object_return_none = False
+    decode_text = False
 
 
     def split_url (self):
@@ -79,6 +81,8 @@ class WikiPageMixin (object):
         kwargs['child'] = self.kwargs.get('child', None)
         kwargs['self_url'] = self.kwargs['url'][-1]+'/' if self.kwargs['url'] else ''
         kwargs['add_mode'] = self.get_object_return_none
+        if self.decode_text:
+            kwargs['decoding_text'] = WikiToHTMLDecoder (self.object.text,self.queryset).run_decode()
         return self.upper_class.get_context_data(self,**kwargs)
 
     def get_object(self, queryset=None):
@@ -115,6 +119,7 @@ class WikiPageView (WikiPageMixin, DetailView):
     template_name = "wiki_page_detail.html"
     show_child = True
     upper_class = DetailView
+    decode_text = True
 
     def dispatch(self, request, *args, **kwargs):
         self.split_url()
