@@ -12,14 +12,11 @@ def check_correct_url(url_str, queryset):
         try:
             obj = work_queryset.get()
         except ObjectDoesNotExist:
-#            assert False
             return (u'/add' if i==0 else u'/{0}/'.format('/'.join(list_url[:i]))+'add',False)
         if i == 0:
             if (obj.parent_pg_url):
-#                assert False
                 return (u'/add',False)
         elif not obj.parent_pg_url or list_url[i-1] != obj.parent_pg_url:
-#            assert False
             return (u'/{0}/'.format('/'.join(list_url[:i]))+'add',False)
     return (u'/{0}/'.format(u'/'.join(list_url)) if len (list_url)>0 else '/', obj.header)
 
@@ -33,7 +30,6 @@ class WikiToHTMLDecoder(object):
         self.queryset = queryset
         self.exp_find_link = re.compile(r'\[\[([^\]]*)\]\]')
         self.wiki_tags_re = [re.compile(x) for x in self.wiki_tags_re_str]
-#        super(WikiToHTMLDecoder,self).__init__()
 
     def replace_one_tag (self, str_in, tag_number):
         positions = [x.span() for x in self.wiki_tags_re[tag_number].finditer(str_in)]

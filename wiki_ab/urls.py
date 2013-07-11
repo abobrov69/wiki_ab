@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, include, url
-from views import AboutView, WikiPageView, RootPageView, WikiPageUpdate, WikiPageDelete, WikiPageCreate, wiki_page_not_found
-
+from views import AboutView, WikiPageView, RootPageView, WikiPageUpdate, WikiPageDelete, WikiPageCreate
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -22,7 +21,6 @@ urlpatterns = patterns('',
     url('^$', RootPageView.as_view (), name="rootpage"),
     url(r'^admin/', include(admin.site.urls)),
     (r'^about/$', AboutView.as_view()),
-#    (r'(^([^/]+)/)*(tst/|tst)$', wiki_page_not_found),
     (r'(^([^/]+)/)*(add/|add)$', WikiPageCreate.as_view()),
     (r'(^([^/]+)/)*(edit/|edit)$', WikiPageUpdate.as_view()),
     (r'(^([^/]+)/)*(delete/|delete)$', WikiPageDelete.as_view()),

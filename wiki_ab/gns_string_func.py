@@ -93,7 +93,6 @@ def transliterate_and_lower(string):
 
     for ch in string:
         c = lower_case_letters[ch] if ch in lower_case_letters else ch
-#        print (char)
         translit_string += c
 
     return translit_string
@@ -104,7 +103,6 @@ def transliterate_and_convert_to_url(string):
 
     for ch in string:
         c = lower_case_letters[ch] if ch in lower_case_letters else ch if ch in ascii_lowercase else '_'
-#        print (char)
         translit_string += c
 
     return translit_string

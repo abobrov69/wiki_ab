@@ -31,15 +31,9 @@ class RootPageView(ListView):
     template_name = 'wiki_root.html'
     context_object_name = 'pg_list'
 
-#    def get_queryset (self):
-#        queryset = super (RootPageView, self).get_queryset()
-#        a = c
-#        return queryset
-
 def display_meta(request,*kwargs):
     values = request.META.items()
     a = [v for k,v in values if k == 'PATH_INFO'][0]
-#    s = q
     values.sort()
     html = []
     for k, v in values:
@@ -68,7 +62,6 @@ class WikiPageMixin (object):
     get_object_return_none = False
     decode_text = False
 
-
     def split_url (self):
         self.kwargs['url'] = [v for k,v in self.request.META.items() if k == 'PATH_INFO'][0].split('/')
         if not self.kwargs['url'][-1]: del self.kwargs['url'][-1]
@@ -92,10 +85,8 @@ class WikiPageMixin (object):
         for i in range(0,len(self.kwargs['url'])):
             slug = self.kwargs['url'][i]
             work_queryset = queryset.filter(**{slug_field: slug})
-#            aaa = aaa1
             try:
                 obj = work_queryset.get()
-#                a = sasl
             except ObjectDoesNotExist:
                 raise Http404(("No %(verbose_name)s found matching the query") %
                           {'verbose_name': queryset.model._meta.verbose_name})
@@ -123,7 +114,6 @@ class WikiPageView (WikiPageMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         self.split_url()
-#        a = lljk
         return DetailView.dispatch(self, request, *args, **kwargs)
 
 class WikiPageUpdate (WikiPageMixin, UpdateView):
@@ -163,14 +153,9 @@ class WikiPageCreate(WikiPageMixin,UpdateView):
         return UpdateView.dispatch(self, request, *args, **kwargs)
 
     def form_valid(self, form):
-        """
-        If the form is valid, save the associated model.
-        """
         self.object = form.save()
         if not self.object.pg_url:
             self.object.pg_url = transliterate_and_convert_to_url (self.object.header)
-#            a = self.object
-#            skd = dsd
         self.object.parent_pg_url = self.parent_pg_url
         self.object.save()
         self.success_url = (u'/{0}/'.format('/'.join(self.kwargs['url'])) if len(self.kwargs['url'])>0 else '/') + self.object.pg_url + '/'
